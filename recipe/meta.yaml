@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.8.2" %}
+{% set version = "3.8.3" %}
 
 package:
   name: {{ name|lower }}
@@ -7,12 +7,12 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: fe882f22a49dc38b70243987de0b88a8f9660f9018e45d3adaff1babc3e8d806
+  sha256: bb069cfdd4c65083b0a1208036db4b659ac6fadd7fa43b3a626e4d6bdf2a2a6f
   folder: dxtbx
 
 build:
-  skip: True  # [win]
-  number: 2
+  skip: true  # [win]
+  number: 0
 
 requirements:
   build:
@@ -63,7 +63,7 @@ about:
   license: BSD-3-Clause
   license_family: BSD
   license_file: dxtbx/LICENSE.txt
-  summary: 'Diffraction Experiment Toolbox'
+  summary: Diffraction Experiment Toolbox
   description: |
     A cctbx-style toolbox to describe single-crystal diffraction experiments,
     where a monochromatic beam is used to illuminate a sample which is rotated
