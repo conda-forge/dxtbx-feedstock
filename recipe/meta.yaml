@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.9.0" %}
+{% set version = "3.9.1" %}
 
 package:
   name: {{ name|lower }}
@@ -7,12 +7,32 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 14dd6b897e080dd9babfe00a08ebe1cc1cd999be0d73676029c5c08e8835d57d
+  sha256: e7961baf69509eca52a619cc35589cc57db0fa4fe6df8e335cf027f82d6d7ea0
   folder: dxtbx
 
 build:
-  skip: true  # [win]
-  number: 0
+  number: 1
+  entry_points:
+    - cxi.image2pickle = dxtbx.command_line.image2pickle:run
+    - cxi.image_average = dxtbx.command_line.image_average:run
+    - dev.dxtbx.debug_memory = dxtbx.command_line.debug_memory:run
+    - dev.dxtbx.read_sequence = dxtbx.command_line.read_sequence:run
+    - dxtbx.depends_on = dxtbx.command_line.depends_on:run
+    - dxtbx.detector_superpose = dxtbx.command_line.detector_superpose:run
+    - dxtbx.display_parallax_correction = dxtbx.command_line.display_parallax_correction:run
+    - dxtbx.dlsnxs2cbf = dxtbx.command_line.dlsnxs2cbf:run
+    - dxtbx.image2pickle = dxtbx.command_line.image2pickle:run
+    - dxtbx.image_average = dxtbx.command_line.image_average:run
+    - dxtbx.install_format = dxtbx.command_line.install_format:run
+    - dxtbx.overload = dxtbx.command_line.overload:run
+    - dxtbx.plot_detector_models = dxtbx.command_line.plot_detector_models:run
+    - dxtbx.print_header = dxtbx.command_line.print_header:run
+    - dxtbx.print_matching_images = dxtbx.command_line.print_matching_images:run
+    - dxtbx.radial_average = dxtbx.command_line.radial_average:run
+    - dxtbx.saturation = dxtbx.command_line.saturation:run
+    - dxtbx.show_mask_info = dxtbx.command_line.show_mask_info:run
+    - dxtbx.show_matching_formats = dxtbx.command_line.show_matching_formats:run
+    - dxtbx.show_registry = dxtbx.command_line.show_registry:run
 
 requirements:
   build:
@@ -55,7 +75,8 @@ test:
   imports:
     - dxtbx.ext
   commands:
-    - pytest $SRC_DIR/dxtbx/tests --regression
+    - pytest $SRC_DIR/dxtbx/tests --regression  # [not win]
+    - pytest %SRC_DIR%/dxtbx/tests --regression  # [win]
     - pip check
 
 about:
