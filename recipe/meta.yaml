@@ -47,7 +47,7 @@ requirements:
     - boost
     - cctbx-base >=2021.12
     - hdf5
-    - numpy 1.19,<1.21|>=1.21.5
+    - numpy
     - pip
     - pybind11
     - python
