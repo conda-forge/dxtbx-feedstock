@@ -36,6 +36,10 @@ build:
 
 requirements:
   build:
+    - python                                 # [build_platform != target_platform]
+    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+    - numpy                                  # [build_platform != target_platform]
+    - pybind11                               # [build_platform != target_platform]
     - {{ compiler('cxx') }}
     - cmake
     - ninja
@@ -43,7 +47,7 @@ requirements:
     - boost
     - cctbx-base >=2021.12
     - hdf5
-    - numpy 1.19,<1.21|>=1.21.5
+    - numpy
     - pip
     - pybind11
     - python
