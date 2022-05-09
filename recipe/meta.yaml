@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.9.1" %}
+{% set version = "3.9.2" %}
 
 package:
   name: {{ name|lower }}
@@ -7,11 +7,11 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: e7961baf69509eca52a619cc35589cc57db0fa4fe6df8e335cf027f82d6d7ea0
+  sha256: 4d138788b2916694de5b6c4259fcb1a8178c31302f25b790bc15a66e003a757d
   folder: dxtbx
 
 build:
-  number: 1
+  number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
     - cxi.image_average = dxtbx.command_line.image_average:run
