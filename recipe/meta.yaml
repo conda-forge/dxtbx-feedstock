@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.9.2" %}
+{% set version = "3.10.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 4d138788b2916694de5b6c4259fcb1a8178c31302f25b790bc15a66e003a757d
+  sha256: 9291b31f7a5d978588fcd0ac7cdd0ca9a2fa2df723e08a0b2aa54bec741426eb
   folder: dxtbx
 
 build:
