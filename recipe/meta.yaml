@@ -11,6 +11,7 @@ source:
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
+    - patch_nxmx_xfail.diff  # [win]
 
 build:
   skip: True  # [py<38]
