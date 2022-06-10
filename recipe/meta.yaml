@@ -14,7 +14,6 @@ source:
 
 build:
   skip: True  # [py<38]
-  skip: True  # [py!=39 or not win]
   number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
