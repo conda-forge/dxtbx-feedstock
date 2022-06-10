@@ -10,7 +10,7 @@ source:
   sha256: 9291b31f7a5d978588fcd0ac7cdd0ca9a2fa2df723e08a0b2aa54bec741426eb
   folder: dxtbx
   patches:
-    - patch_windows_entrypoint.patch  # [win]
+    - patch_windows_entrypoint.diff  # [win]
 
 build:
   skip: True  # [py<38]
