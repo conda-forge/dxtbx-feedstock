@@ -12,6 +12,7 @@ source:
 
 build:
   skip: True  # [py<38]
+  skip: True  # [py!=39 or not win]
   number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
@@ -80,8 +81,8 @@ test:
   imports:
     - dxtbx.ext
   commands:
-    - pytest $SRC_DIR/dxtbx/tests --regression  # [not win]
-    - pytest %SRC_DIR%/dxtbx/tests --regression  # [win]
+    # - pytest $SRC_DIR/dxtbx/tests --regression  # [not win]
+    # - pytest %SRC_DIR%/dxtbx/tests --regression  # [win]
     - pip check
 
 about:
