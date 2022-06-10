@@ -1,0 +1,25 @@
+From 2964b6e03649ccd8d022e1357ae7b270860b2417 Mon Sep 17 00:00:00 2001
+From: Nicholas Devenish <ndevenish@gmail.com>
+Date: Fri, 10 Jun 2022 10:20:30 +0100
+Subject: [PATCH] Add fake FormatEigerStream to fix cctbx distribution
+
+---
+ src/dxtbx/format/FormatEigerStream.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+ create mode 100644 src/dxtbx/format/FormatEigerStream.py
+
+diff --git a/src/dxtbx/format/FormatEigerStream.py b/src/dxtbx/format/FormatEigerStream.py
+new file mode 100644
+index 000000000..8e7ee6c40
+--- /dev/null
++++ b/src/dxtbx/format/FormatEigerStream.py
+@@ -0,0 +1,9 @@
++from __future__ import annotations
++
++from dxtbx.format.Format import Format
++
++
++class FormatEigerStream(Format):
++    @staticmethod
++    def understand(image_file):
++        return False
