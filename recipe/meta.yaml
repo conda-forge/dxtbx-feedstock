@@ -64,7 +64,6 @@ requirements:
     - matplotlib-base
     - {{ pin_compatible('numpy') }}
     - pint
-    - procrunner
     - pycbf
     - python
     - python-dateutil >=2.7.0
@@ -77,9 +76,10 @@ test:
     - dxtbx/conftest.py
   requires:
     - dials-data
+    - pip
+    - procrunner
     - pytest <7
     - pytest-mock
-    - pip
   imports:
     - dxtbx.ext
   commands:
