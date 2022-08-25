@@ -62,6 +62,7 @@ requirements:
     - h5py
     - hdf5plugin
     - matplotlib-base
+    - mrcfile
     - {{ pin_compatible('numpy') }}
     - pint
     - pycbf
