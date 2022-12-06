@@ -48,7 +48,7 @@ requirements:
     - cmake
     - ninja
   host:
-    - boost
+    - boost <1.75
     - cctbx-base >=2022.5
     - hdf5
     - numpy
