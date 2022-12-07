@@ -6,7 +6,7 @@ index ddf42818..98910359 100644
          yield f
  
  
-+@pytest.xfail
++@pytest.mark.xfail
  def test_get_raw_data_single_panel(nxdata_example):
      det = dxtbx.nexus.nxmx.NXdetector(nxdata_example["/entry/instrument/detector"])
      nxdata = dxtbx.nexus.nxmx.NXdata(nxdata_example["/entry/data"])
