@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.10.3" %}
+{% set version = "3.11.2" %}
 
 package:
   name: {{ name|lower }}
@@ -7,15 +7,16 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 4fcd8f7cb59fb045d58ce286c62b8af0c2ba7ccbec15c532bb878dde6bd7f36a
+  sha256: d489c012c6caed4cfc2449dd0ba343b9acf209ed9d03bd360993f90e69ba9cca
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
     - patch_nxmx_xfail.diff  # [win]
+    - patch_nxmx_get_raw_data_single_panel_xfail.diff  # [win]
 
 build:
   skip: true  # [py<38]
-  number: 1
+  number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
     - cxi.image_average = dxtbx.command_line.image_average:run
