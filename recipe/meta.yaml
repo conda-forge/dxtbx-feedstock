@@ -64,6 +64,7 @@ requirements:
     - hdf5plugin
     - matplotlib-base
     - {{ pin_compatible('numpy') }}
+    - nxmx
     - pint
     - procrunner
     - pycbf
