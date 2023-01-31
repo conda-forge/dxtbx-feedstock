@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 61acf700ad1e9f4ecba6251c8064f901a238388f398b57f54eab6784a97385e6
+  sha256: 59caa1e115fa6f2ed9d1dad0265b6ec8164dcf6295976cea33a88980db81a068
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
