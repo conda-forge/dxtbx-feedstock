@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.12.1" %}
+{% set version = "3.13.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,12 +7,13 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: bd2d68328ba6e3091e037c0785f154b26471cdc195d4df9c0cee2a53b3328140
+  sha256: 59caa1e115fa6f2ed9d1dad0265b6ec8164dcf6295976cea33a88980db81a068
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
     - patch_nxmx_xfail.diff  # [win]
     - patch_nxmx_get_raw_data_single_panel_xfail.diff  # [win]
+    - patch_v3.13.1_flumpy_prepatch.diff
 
 build:
   skip: true  # [py<38]
@@ -64,6 +65,7 @@ requirements:
     - hdf5plugin
     - matplotlib-base
     - {{ pin_compatible('numpy') }}
+    - nxmx
     - pint
     - procrunner
     - pycbf
