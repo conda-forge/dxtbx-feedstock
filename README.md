@@ -249,6 +249,7 @@ Feedstock Maintainers
 =====================
 
 * [@anthchirp](https://github.com/anthchirp/)
+* [@jbeilstenedmands](https://github.com/jbeilstenedmands/)
 * [@ndevenish](https://github.com/ndevenish/)
 * [@rjgildea](https://github.com/rjgildea/)
 
