@@ -79,7 +79,7 @@ test:
     - dxtbx/conftest.py
   requires:
     - dials-data
-    - pytest <7
+    - pytest
     - pytest-mock
     - pip
   imports:
