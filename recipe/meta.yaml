@@ -65,6 +65,7 @@ requirements:
     - matplotlib-base
     - {{ pin_compatible('numpy') }}
     - nxmx
+    - orderedset
     - pint
     - procrunner
     - pycbf
