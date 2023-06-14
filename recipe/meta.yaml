@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.14.2" %}
+{% set version = "3.15.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 6cda0785b4a286aaefae2b4f3ba93e8db70fc345b527b24fedf8aae15e367ba6
+  sha256: cc6e70292caa882fd2cb1137589eea506584545bbb8d2792020a4c4d818e0fee
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
@@ -16,7 +16,7 @@ source:
 
 build:
   skip: true  # [py<38]
-  number: 1
+  number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
     - cxi.image_average = dxtbx.command_line.image_average:run
@@ -65,6 +65,7 @@ requirements:
     - matplotlib-base
     - {{ pin_compatible('numpy') }}
     - nxmx
+    - orderedset
     - pint
     - procrunner
     - pycbf
