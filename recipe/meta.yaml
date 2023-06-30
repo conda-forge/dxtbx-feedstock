@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.15.0" %}
+{% set version = "3.15.1" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: cc6e70292caa882fd2cb1137589eea506584545bbb8d2792020a4c4d818e0fee
+  sha256: f14b4af2d48ef9ee2ad1142b0906f4ff2e5306774048454e7c71b04f7e79001c
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
