@@ -50,7 +50,7 @@ requirements:
     - ninja
   host:
     - boost
-    - cctbx-base >=2022.5
+    - cctbx-base >=2023.7
     - hdf5
     - numpy
     - pip
@@ -67,7 +67,6 @@ requirements:
     - nxmx
     - orderedset
     - pint
-    - procrunner
     - pycbf
     - python
     - python-dateutil >=2.7.0
