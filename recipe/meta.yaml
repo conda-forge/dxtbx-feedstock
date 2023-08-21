@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.15.1" %}
+{% set version = "3.16.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: f14b4af2d48ef9ee2ad1142b0906f4ff2e5306774048454e7c71b04f7e79001c
+  sha256: afed560c13625c17b00c8f43a01eae049eb30b1e692b53095cc96dff136019f5
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
@@ -50,7 +50,7 @@ requirements:
     - ninja
   host:
     - boost
-    - cctbx-base >=2022.5
+    - cctbx-base >=2023.7
     - hdf5
     - numpy
     - pip
@@ -67,7 +67,6 @@ requirements:
     - nxmx
     - orderedset
     - pint
-    - procrunner
     - pycbf
     - python
     - python-dateutil >=2.7.0
