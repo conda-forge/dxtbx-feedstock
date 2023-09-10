@@ -16,7 +16,7 @@ source:
 
 build:
   skip: true  # [py<38]
-  number: 1
+  number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
     - cxi.image_average = dxtbx.command_line.image_average:run
@@ -59,6 +59,7 @@ requirements:
   run:
     - {{ pin_compatible('boost') }}
     - {{ pin_compatible('cctbx-base') }}
+    - {{ pin_compatible('hdf5') }}
     - h5py
     - hdf5plugin
     - matplotlib-base
