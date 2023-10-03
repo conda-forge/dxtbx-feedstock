@@ -1,5 +1,8 @@
 @echo on
 
+:: see https://github.com/boostorg/system/issues/32#issuecomment-462912013
+set "CXXFLAGS=%CXXFLAGS% /DHAVE_SNPRINTF=1"
+
 mkdir _build
 cd _build
 
