@@ -50,7 +50,7 @@ requirements:
     - ninja
   host:
     - libboost-python-devel
-    - cctbx-base >=2023.7
+    - cctbx-base >=2023.10
     - hdf5
     - numpy
     - pip
@@ -105,5 +105,3 @@ extra:
   recipe-maintainers:
     - jbeilstenedmands
     - ndevenish
-    - rjgildea
-    - anthchirp
