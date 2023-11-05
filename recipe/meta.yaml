@@ -16,7 +16,7 @@ source:
 
 build:
   skip: true  # [py<39]
-  number: 0
+  number: 1
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
     - cxi.image_average = dxtbx.command_line.image_average:run
