@@ -62,6 +62,7 @@ requirements:
     - h5py
     - hdf5plugin
     - matplotlib-base
+    - natsort
     - {{ pin_compatible('numpy') }}
     - nxmx
     - orderedset
