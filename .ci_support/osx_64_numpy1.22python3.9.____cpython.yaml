@@ -15,7 +15,7 @@ cxx_compiler_version:
 hdf5:
 - 1.14.3
 libboost_python_devel:
-- '1.82'
+- '1.84'
 macos_machine:
 - x86_64-apple-darwin13.4.0
 numpy:
@@ -29,7 +29,5 @@ python:
 target_platform:
 - osx-64
 zip_keys:
-- - c_stdlib_version
-  - MACOSX_DEPLOYMENT_TARGET
 - - python
   - numpy
