@@ -1,0 +1,391 @@
+diff --git a/.azure-pipelines/azure-pipelines.yml b/.azure-pipelines/azure-pipelines.yml
+index c5ec71f44..8cb10339d 100644
+--- a/.azure-pipelines/azure-pipelines.yml
++++ b/.azure-pipelines/azure-pipelines.yml
+@@ -90,8 +90,8 @@ stages:
+         matrix:
+           python39:
+             PYTHON_VERSION: 3.9
+-          python311:
+-            PYTHON_VERSION: 3.11
++          python312:
++            PYTHON_VERSION: 3.12
+       timeoutInMinutes: 60
+       steps:
+       - template: unix-build.yml
+@@ -103,8 +103,8 @@ stages:
+         matrix:
+           python39:
+             PYTHON_VERSION: 3.9
+-          python311:
+-            PYTHON_VERSION: 3.11
++          python312:
++            PYTHON_VERSION: 3.12
+       timeoutInMinutes: 60
+       steps:
+       - template: unix-build.yml
+@@ -116,8 +116,8 @@ stages:
+         matrix:
+           python39:
+             PYTHON_VERSION: 3.9
+-          python311:
+-            PYTHON_VERSION: 3.11
++          python312:
++            PYTHON_VERSION: 3.12
+       timeoutInMinutes: 20
+       steps:
+       - template: windows-build.yml
+diff --git a/.azure-pipelines/bootstrap.py b/.azure-pipelines/bootstrap.py
+index becd7a72b..46878a35b 100644
+--- a/.azure-pipelines/bootstrap.py
++++ b/.azure-pipelines/bootstrap.py
+@@ -847,7 +847,7 @@ def run():
+         "--python",
+         help="Install this minor version of Python (default: %(default)s)",
+         default="3.9",
+-        choices=("3.9", "3.10", "3.11"),
++        choices=("3.9", "3.10", "3.11", "3.12"),
+     )
+     parser.add_argument(
+         "--branch",
+diff --git a/.azure-pipelines/ci-conda-env.txt b/.azure-pipelines/ci-conda-env.txt
+index 2506f20b1..d9c93bc90 100644
+--- a/.azure-pipelines/ci-conda-env.txt
++++ b/.azure-pipelines/ci-conda-env.txt
+@@ -2,7 +2,7 @@ conda-forge::boost
+ conda-forge::boost-cpp
+ conda-forge::bzip2
+ conda-forge::c-compiler<1.5
+-cctbx-nightly::cctbx-base
++conda-forge::cctbx-base
+ conda-forge::conda
+ conda-forge::cxx-compiler<1.5
+ conda-forge::python-dateutil
+@@ -12,8 +12,7 @@ conda-forge::eigen
+ conda-forge::future
+ conda-forge::h5py>=3.1
+ conda-forge::hdf5plugin
+-conda-forge::hdf5>=1.12,<1.13
+-conda-forge::jpeg
++conda-forge::hdf5
+ conda-forge::matplotlib-base
+ conda-forge::mrcfile
+ conda-forge::natsort
+diff --git a/cmake/Modules/FindCCTBX.cmake b/cmake/Modules/FindCCTBX.cmake
+index d78c0c8cf..ded2129da 100644
+--- a/cmake/Modules/FindCCTBX.cmake
++++ b/cmake/Modules/FindCCTBX.cmake
+@@ -29,7 +29,7 @@
+ # available for linking with the target name ``CCTBX::cctbx::cctbx``.
+ #
+ # The database for recognising these shared library targets can be found
+-# in ``module_libraries.json`` in the folder above this FindCCTBX module.
++# in ``module_info.json`` in the folder above this FindCCTBX module.
+ 
+ # If python isn't already included, pull it in here
+ if (NOT TARGET Python::Interpreter)
+@@ -55,15 +55,29 @@ function(_cctbx_determine_libtbx_build_dir)
+     execute_process(COMMAND ${Python_EXECUTABLE} -c "import libtbx.load_env; print(abs(libtbx.env.build_path))"
+                     RESULT_VARIABLE _LOAD_ENV_RESULT
+                     OUTPUT_VARIABLE _LOAD_LIBTBX_BUILD_DIR
+-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
++                    OUTPUT_STRIP_TRAILING_WHITESPACE
++                    ERROR_QUIET)
+ 
+     if (NOT ${_LOAD_ENV_RESULT})
+         # We found it via python import
++        message(DEBUG "Got libtbx build path: ${_LOAD_LIBTBX_BUILD_DIR}")
+         set(CCTBX_BUILD_DIR "${_LOAD_LIBTBX_BUILD_DIR}" CACHE FILEPATH "Location of CCTBX build directory")
+-        message(DEBUG "Got libtbx build path: ${CCTBX_BUILD_DIR}")
+         return()
+     endif()
+ 
++    message(DEBUG "Could not find through direct python; looking for libtbx.python as last resort")
++    execute_process(COMMAND "libtbx.python" -c "import libtbx.load_env; print(abs(libtbx.env.build_path))"
++                    RESULT_VARIABLE _TBX_LOAD_ENV_RESULT
++                    OUTPUT_VARIABLE _TBX_LOAD_LIBTBX_BUILD_DIR
++                    OUTPUT_STRIP_TRAILING_WHITESPACE
++                    ERROR_QUIET)
++
++    if (NOT ${_TBX_LOAD_ENV_RESULT})
++        # We found it via python import
++        message(DEBUG "Got libtbx build path: ${_TBX_LOAD_LIBTBX_BUILD_DIR}")
++        set(CCTBX_BUILD_DIR "${_TBX_LOAD_LIBTBX_BUILD_DIR}" CACHE FILEPATH "Location of CCTBX build directory")
++        return()
++    endif()
+ endfunction()
+ 
+ function(_read_libtbx_env RESULT_VARIABLE)
+@@ -99,7 +113,6 @@ endfunction()
+ 
+ # Read details for a single module out of libtbx_env and other info
+ function(_cctbx_read_module MODULE)
+-    # Read the libtbx environment file
+     _read_libtbx_env(_env_json)
+     # We now have a json representation of libtbx_env - extract the entry for this modile
+     string(JSON _module_json ERROR_VARIABLE _error GET "${_env_json}" module_dict ${MODULE})
+@@ -119,39 +132,80 @@ function(_cctbx_read_module MODULE)
+     string(JSON _include_paths GET "${_env_json}" include_path)
+     string(JSON _lib_path GET "${_env_json}" lib_path)
+ 
+-    # Work out what paths need to be included for this module
++    # Read the metainfo database - we might have extra information we need to inject
++    file(READ "${CMAKE_CURRENT_LIST_DIR}/../module_info.json" _modules_db)
++    # Read a list of libraries that this module exports
++    string(JSON _module_libs     ERROR_VARIABLE _error GET "${_modules_db}" "libraries" "${MODULE}")
++    # Read the extra include paths for this module
++    string(JSON _module_includes_array ERROR_VARIABLE _error GET "${_modules_db}" "includes" "${MODULE}")
++    if (_module_includes_array)
++        # Convert this array to a CMake list
++        string(JSON _n_includes LENGTH "${_module_includes_array}")
++        math(EXPR _n_includes "${_n_includes} - 1")  # CMake RANGE is inclusive
++        foreach( _n RANGE "${_n_includes}")
++            string(JSON _include GET "${_module_includes_array}" "${_n}")
++            list(APPEND _module_includes "${_include}")
++        endforeach()
++    endif()
++
++    # Work out what dist paths need to be consulted for this module
+     string(JSON _n_dist_paths LENGTH "${_module_json}" dist_paths)
+-    math(EXPR _n_dist_paths "${_n_dist_paths} - 1")
+-    # We need to account for:
+-    # Algorithm: if folder has an include/ subdir:
+-    #               use that
+-    #            else:
+-    #               use the path above
+-    # - this accounts for most cases, and it seems unlikely that we will
+-    #   be importing uniquely from modules that this doesn't cover. There
+-    #   was an exhaustive mapping list in tbx2cmake but the new installed
+-    #   layout confuses that somewhat.
++    math(EXPR _n_dist_paths "${_n_dist_paths} - 1")  # CMake RANGE is inclusive
++
++    # We need to work out include/ directories for this module.
++    #
++    # Algorithm: For every listed dist path:
++    #               if the module_info database contains an entry for this module:
++    #                   use those
++    #               else if folder has an include/ subdir:
++    #                   use that
++    #               else:
++    #                   use the parent of the dist path above
+     foreach(_n RANGE "${_n_dist_paths}")
+         string(JSON _dist_path GET "${_module_json}" dist_paths ${_n})
+         if(NOT _dist_path)
+             continue()
+         endif()
+-        list(APPEND _dist_paths "${_dist_path}/include")
+-        if (EXISTS "${_dist_path}/include")
+-            list(APPEND _include_paths "${_dist_path}/include")
++        list(APPEND _dist_paths "${_dist_path}")
++        # If we don't have a specific include-path override for this,
++        # then use the dist-paths as roots for the include paths
++        if (_module_includes)
++            # Try appending every includes dir
++            foreach(_include ${_module_includes})
++                # Build up a full path for this
++                string(FIND "${_include}" "#build/" _build_relative)
++                if ("${_build_relative}" EQUAL 0)
++                    string(SUBSTRING "${_include}" 7 -1 _include)
++                    # We use an include directory relative to the environment build/
++                    cmake_path(APPEND CCTBX_BUILD_DIR "${_include}" OUTPUT_VARIABLE _full_include)
++                else()
++                    cmake_path(APPEND _dist_path "${_include}" OUTPUT_VARIABLE _full_include)
++                endif()
++                cmake_path(ABSOLUTE_PATH _full_include NORMALIZE)
++                # We might have multiple dist paths. Only use include dirs that exist.
++                if(EXISTS "${_full_include}")
++                    list(APPEND _include_paths "${_full_include}")
++                endif()
++            endforeach()
+         else()
+-            cmake_path(GET _dist_path PARENT_PATH _result)
+-            list(APPEND _include_paths "${_result}")
++            # We didn't have any specific override. If include/ exists
++            # then use that, otherwise use the module parent directory.
++            if (EXISTS "${_dist_path}/include")
++                list(APPEND _include_paths "${_dist_path}/include")
++            else()
++                cmake_path(GET _dist_path PARENT_PATH _result)
++                list(APPEND _include_paths "${_result}")
++            endif()
+         endif()
+     endforeach()
+     list(REMOVE_DUPLICATES _include_paths)
+     list(REMOVE_DUPLICATES _dist_paths)
+-
+     target_include_directories(${_target} INTERFACE ${_include_paths})
++    message(DEBUG "${MODULE} include directories: ${_include_paths}")
++    set(CCTBX_${MODULE}_DIST "${_dist_paths}" PARENT_SCOPE)
+ 
+     # Find if this module has a "base" library, and any sub-libraries
+-    file(READ "${CMAKE_CURRENT_LIST_DIR}/../module_libraries.json" _modules_libs)
+-    string(JSON _module_libs GET "${_modules_libs}" "${MODULE}")
++    # string(JSON _modules_libs GET "${_modules_libs}" "libraries")
+     if (_module_libs)
+         # We have actual libraries to import as imported libraries
+         # iterate over every key: value in the object
+@@ -159,22 +213,35 @@ function(_cctbx_read_module MODULE)
+         math(EXPR _n_libs "${_n_libs} - 1")
+         foreach(_n RANGE ${_n_libs})
+             string(JSON _name MEMBER "${_module_libs}" ${_n})
+-            string(JSON _libname GET "${_module_libs}" "${_name}")
+-            set(lib_cache_var "_liblocation_CCTBX_${MODULE}_${_name}")
+-            # Find this library
+-            find_library(${lib_cache_var} ${_libname} HINTS ${_lib_path})
+-            message(DEBUG "Found ${lib_cache_var}='${${lib_cache_var}}'")
+-            if(_name STREQUAL base)
+-                message(DEBUG "Module ${_target} has root library ${_libname}")
+-                if (NOT ${lib_cache_var})
+-                    message(WARNING "Libtbx module ${MODULE} has base library named ${_libname} but cannot find it - the module may be misconfigured")
+-                else()
+-                    target_link_libraries(${_target} INTERFACE ${${lib_cache_var}})
++            string(JSON _libnames GET "${_module_libs}" "${_name}")
++            set(_lib_searchname "_lib_${MODULE}_${_name}")
++
++
++            # Find this library - or the first of a list of fallback options
++            foreach(_libname ${_libnames})
++                message(DEBUG "Processing ${_libname}")
++                set(lib_specific_name "_liblocation_CCTBX_${MODULE}_${_libname}")
++                find_library(${lib_specific_name} ${_libname} HINTS ${_lib_path})
++                if(${lib_specific_name})
++                    set(${_lib_searchname} "${${lib_specific_name}}")
++                    message(DEBUG "Found ${lib_specific_name}=${${lib_specific_name}}")
++                    break()
+                 endif()
++                message(DEBUG "Didn't find lib${_libname} for ${MODULE}::${_name}")
++            endforeach()
++
++            if (NOT ${_lib_searchname})
++                # If this library isn't present, it might not be important - so warn only
++                message(WARNING "Libtbx module ${MODULE} has library named lib${_libname} but cannot find it - the module may be misconfigured")
+             else()
+-                message(DEBUG "Extra library ${_target}::${_name} = ${_libname}")
+-                add_library(${_target}::${_name} INTERFACE IMPORTED)
+-                target_link_libraries(${_target}::${_name} INTERFACE ${_target} ${${lib_cache_var}})
++                if(_name STREQUAL base)
++                    message(DEBUG "Module library ${_target} has root library at ${${_lib_searchname}}")
++                    target_link_libraries(${_target} INTERFACE "${${_lib_searchname}}")
++                else()
++                    message(DEBUG "Extra library ${_target}::${_name} = ${${_lib_searchname}}")
++                    add_library(${_target}::${_name} INTERFACE IMPORTED)
++                    target_link_libraries(${_target}::${_name} INTERFACE ${_target} "${${_lib_searchname}}")
++                endif()
+             endif()
+         endforeach()
+     endif()
+@@ -184,6 +251,8 @@ endfunction()
+ if (NOT CCTBX_BUILD_DIR)
+     _cctbx_determine_libtbx_build_dir()
+ endif()
++# Make this absolute, in case it was specified as relative
++cmake_path(ABSOLUTE_PATH CCTBX_BUILD_DIR BASE_DIRECTORY "${CMAKE_BINARY_DIR}" NORMALIZE)
+ 
+ if (CCTBX_BUILD_DIR)
+     message(DEBUG "Using build dir ${CCTBX_BUILD_DIR}")
+diff --git a/cmake/module_info.json b/cmake/module_info.json
+new file mode 100644
+index 000000000..81b1830dc
+--- /dev/null
++++ b/cmake/module_info.json
+@@ -0,0 +1,25 @@
++{
++  "libraries": {
++    "annlib": { "base": "ann_cctbx;ann" },
++    "ccp4io": { "base": "ccp4io" },
++    "cctbx": { "base": "cctbx", "sgtbx::direct_space_asu": "cctbx_sgtbx_asu" },
++    "fast_linalg": { "base": "fast_linalg" },
++    "iotbx": { "mtz": "iotbx_mtz", "pdb": "iotbx_pdb", "xplor": "iotbx_xplor" },
++    "maptbx": { "asymmetric_map": "asymmetric_map" },
++    "mmtbx": { "masks": "mmtbx_masks", "tls": "mmtbx_tls" },
++    "omptbx": { "base": "omptbx" },
++    "rstbx": { "base": "rstbx" },
++    "scitbx": {
++      "boost_python": "scitbx_boost_python",
++      "minpack": "scitbx_minpack",
++      "slatec": "scitbx_slatec"
++    },
++    "smtbx": { "refinement_constraints": "smtbx_refinement_constraints" },
++    "spotfinder": { "base": "spotfinder", "dxtbx": "dxtbxspotfinder" },
++    "xfel": { "legacy_scale": "legacy_scale", "mono_sim": "xfel_mono_sim" }
++  },
++  "includes": {
++    "annlib": ["include", "#build/annlib_adaptbx/include"],
++    "ccp4io": ["libccp4/ccp4"]
++  }
++}
+diff --git a/cmake/module_libraries.json b/cmake/module_libraries.json
+deleted file mode 100644
+index c66401ba3..000000000
+--- a/cmake/module_libraries.json
++++ /dev/null
+@@ -1,19 +0,0 @@
+-{
+-  "annlib_adaptbx": { "base": "ann" },
+-  "ccp4io": { "base": "ccp4io" },
+-  "cctbx": { "base": "cctbx", "sgtbx::direct_space_asu": "cctbx_sgtbx_asu" },
+-  "fast_linalg": { "base": "fast_linalg" },
+-  "iotbx": { "mtz": "iotbx_mtz", "pdb": "iotbx_pdb", "xplor": "iotbx_xplor" },
+-  "maptbx": { "asymmetric_map": "asymmetric_map" },
+-  "mmtbx": { "masks": "mmtbx_masks", "tls": "mmtbx_tls" },
+-  "omptbx": { "base": "omptbx" },
+-  "rstbx": { "base": "rstbx" },
+-  "scitbx": {
+-    "boost_python": "scitbx_boost_python",
+-    "minpack": "scitbx_minpack",
+-    "slatec": "scitbx_slatec"
+-  },
+-  "smtbx": { "refinement_constraints": "smtbx_refinement_constraints" },
+-  "spotfinder": { "base": "spotfinder", "dxtbx": "dxtbxspotfinder" },
+-  "xfel": { "legacy_scale": "legacy_scale", "mono_sim": "xfel_mono_sim" }
+-}
+diff --git a/cmake/read_env.py b/cmake/read_env.py
+index 64be3746b..db761d9b5 100644
+--- a/cmake/read_env.py
++++ b/cmake/read_env.py
+@@ -169,11 +169,6 @@ def new_module(name, doc=None):
+         # If this is an installed libtbx_env, then we have rules about rewriting it
+         # this is... non-ideal, but since release libtbx_env files are broken on
+         # windows, this is the best place to deal with it.
+-        if sys.platform == "darwin":
+-            print(
+-                "Warning: Not properly handling python.app nuances for environment determination",
+-                file=sys.stderr,
+-            )
+         new_prefix = absolute_path(args.sys_prefix.resolve())
+         if args.windows:
+             new_prefix = absolute_path(args.sys_prefix.resolve() / "library")
+diff --git a/newsfragments/725.feature b/newsfragments/725.feature
+new file mode 100644
+index 000000000..2b04aeb4a
+--- /dev/null
++++ b/newsfragments/725.feature
+@@ -0,0 +1 @@
++Compatility with Python 3.12.
+diff --git a/src/dxtbx/format/Registry.py b/src/dxtbx/format/Registry.py
+index 03dc39e0d..cebcac37b 100644
+--- a/src/dxtbx/format/Registry.py
++++ b/src/dxtbx/format/Registry.py
+@@ -7,6 +7,7 @@
+ 
+ import importlib.metadata
+ import os
++import sys
+ import typing
+ from typing import Callable
+ 
+@@ -34,7 +35,13 @@ def get_format_class_index() -> dict[str, tuple[Callable[[], type[Format]], list
+     """
+     if not hasattr(get_format_class_index, "cache"):
+         class_index = {}
+-        for e in importlib.metadata.entry_points()["dxtbx.format"]:
++        if sys.version_info < (3, 10):
++            # REMOVE when python 3.10 is minimum.
++            # This was was deprecated in 3.10, and removed in 3.12.
++            format_ep = importlib.metadata.entry_points()["dxtbx.format"]
++        else:
++            format_ep = importlib.metadata.entry_points(group="dxtbx.format")
++        for e in format_ep:
+             if ":" in e.name:
+                 format_name, base_classes_str = e.name.split(":", 1)
+                 base_classes = tuple(base_classes_str.split(","))
