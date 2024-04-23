@@ -13,6 +13,7 @@ source:
     - patch_windows_entrypoint.diff  # [win]
     - patch_nxmx_xfail.diff  # [win]
     - patch_nxmx_get_raw_data_single_panel_xfail.diff  # [win]
+    - patch_python_312.diff
 
 build:
   skip: true  # [py<39]
