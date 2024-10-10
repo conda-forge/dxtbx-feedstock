@@ -58,6 +58,7 @@ requirements:
     - pip
     - pybind11
     - python
+    - setuptools
   run:
     - {{ pin_compatible('cctbx-base') }}
     - {{ pin_compatible('hdf5') }}
