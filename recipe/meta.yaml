@@ -13,10 +13,11 @@ source:
     - patch_windows_entrypoint.diff  # [win]
     - patch_nxmx_xfail.diff  # [win]
     - patch_nxmx_get_raw_data_single_panel_xfail.diff  # [win]
+    - 0001-Add-cstdint-to-compression.cc-755.patch
 
 build:
   skip: true  # [py<39]
-  number: 0
+  number: 1
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
     - cxi.image_average = dxtbx.command_line.image_average:run
@@ -58,6 +59,7 @@ requirements:
     - pip
     - pybind11
     - python
+    - setuptools
   run:
     - {{ pin_compatible('cctbx-base') }}
     - {{ pin_compatible('hdf5') }}
