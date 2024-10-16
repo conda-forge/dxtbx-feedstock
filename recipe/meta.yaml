@@ -13,7 +13,6 @@ source:
     - patch_windows_entrypoint.diff  # [win]
     - patch_nxmx_xfail.diff  # [win]
     - patch_nxmx_get_raw_data_single_panel_xfail.diff  # [win]
-    - 0001-Add-cstdint-to-compression.cc-755.patch
 
 build:
   skip: true  # [py<39]
@@ -53,7 +52,7 @@ requirements:
     - ninja
   host:
     - libboost-python-devel
-    - cctbx-base >=2024.3
+    - cctbx-base >=2024.9
     - hdf5
     - numpy
     - pip
