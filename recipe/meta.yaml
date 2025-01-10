@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.22.1" %}
+{% set version = "3.23.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 02a5007a2661d2c7c1cf577886b5d2d8d9de28281a6564658a176c0407cb2e23
+  sha256: 47fd03bd9c2174400210eadf46978b40783660ebb6bfb99bc6c5bf6296d77eb7
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
@@ -15,7 +15,7 @@ source:
     - patch_nxmx_get_raw_data_single_panel_xfail.diff  # [win]
 
 build:
-  skip: true  # [py<39]
+  skip: true  # [py<310]
   number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
@@ -67,7 +67,7 @@ requirements:
     - matplotlib-base
     - natsort
     - {{ pin_compatible('numpy') }}
-    - nxmx
+    - nxmx >=0.0.4
     - orderedset
     - pint
     - pycbf
