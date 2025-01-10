@@ -67,7 +67,7 @@ requirements:
     - matplotlib-base
     - natsort
     - {{ pin_compatible('numpy') }}
-    - nxmx
+    - nxmx >=0.0.4
     - orderedset
     - pint
     - pycbf
