@@ -52,7 +52,7 @@ requirements:
     - ninja
   host:
     - libboost-python-devel
-    - cctbx-base >=2024.9
+    - cctbx-base >=2025.3
     - hdf5
     - numpy
     - pip
@@ -68,7 +68,7 @@ requirements:
     - natsort
     - {{ pin_compatible('numpy') }}
     - nxmx >=0.0.4
-    - orderedset
+    - ordered-set
     - pint
     - pycbf
     - python
