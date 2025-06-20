@@ -15,7 +15,7 @@ source:
     - patch_nxmx_get_raw_data_single_panel_xfail.diff  # [win]
 
 build:
-  skip: true  # [py<310]
+  skip: true  # [py<311]
   number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
@@ -52,7 +52,8 @@ requirements:
     - ninja
   host:
     - libboost-python-devel
-    - cctbx-base >=2025.3
+    - cctbx-base >=2025.5
+    - hatchling
     - hdf5
     - numpy
     - pip
