@@ -89,8 +89,8 @@ test:
   imports:
     - dxtbx.ext
   commands:
-    - pytest $SRC_DIR/dxtbx/tests --regression  # [not win]
-    - pytest %SRC_DIR%/dxtbx/tests --regression  # [win]
+    - pytest $SRC_DIR/dxtbx/tests  # [not win]
+    - pytest %SRC_DIR%/dxtbx/tests  # [win]
     - pip check
 
 about:
