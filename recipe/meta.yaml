@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.25.0" %}
+{% set version = "3.26.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 25cd66211de7cef0cbf260f81a498a573d64299583fe10249243bc01b0f50dae
+  sha256: 4c0efed70c594a2d770f308a84b87d1f0e24ef2aea8d9a6753f10b1f643b63c8
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
@@ -16,7 +16,7 @@ source:
 
 build:
   skip: true  # [py<311]
-  number: 3
+  number: 0
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
     - cxi.image_average = dxtbx.command_line.image_average:run
@@ -89,8 +89,8 @@ test:
   imports:
     - dxtbx.ext
   commands:
-    - pytest $SRC_DIR/dxtbx/tests --regression  # [not win]
-    - pytest %SRC_DIR%/dxtbx/tests --regression  # [win]
+    - pytest $SRC_DIR/dxtbx/tests  # [not win]
+    - pytest %SRC_DIR%/dxtbx/tests  # [win]
     - pip check
 
 about:
