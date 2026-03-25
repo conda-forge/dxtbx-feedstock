@@ -16,7 +16,7 @@ source:
 
 build:
   skip: true  # [py<311]
-  number: 0
+  number: 1
   entry_points:
     - cxi.image2pickle = dxtbx.command_line.image2pickle:run
     - cxi.image_average = dxtbx.command_line.image_average:run
@@ -68,7 +68,7 @@ requirements:
     - matplotlib-base
     - natsort
     - {{ pin_compatible('numpy') }}
-    - nxmx >=0.0.4
+    - nxmx >=0.0.6
     - ordered-set
     - pint
     - pycbf
@@ -82,7 +82,7 @@ test:
     - dxtbx/tests
     - dxtbx/conftest.py
   requires:
-    - dials-data
+    - dials-data <2.4.140
     - pytest
     - pytest-mock
     - pip
