@@ -82,7 +82,7 @@ test:
     - dxtbx/tests
     - dxtbx/conftest.py
   requires:
-    - dials-data
+    - dials-data <2.4.140
     - pytest
     - pytest-mock
     - pip
