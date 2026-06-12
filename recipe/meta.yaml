@@ -1,5 +1,5 @@
 {% set name = "dxtbx" %}
-{% set version = "3.28.1" %}
+{% set version = "3.29.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cctbx/dxtbx/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: fe7fe6045a5ed82825251ac6fef00c278430ab0e9bf78bfac63019760c06436e
+  sha256: 0f1f959ad17bd9f0afb4466cc77ab6b34eb3f263d13ebc6dfd8a215c6ef197bc
   folder: dxtbx
   patches:
     - patch_windows_entrypoint.diff  # [win]
@@ -82,7 +82,7 @@ test:
     - dxtbx/tests
     - dxtbx/conftest.py
   requires:
-    - dials-data <2.4.140
+    - dials-data
     - pytest
     - pytest-mock
     - pip
